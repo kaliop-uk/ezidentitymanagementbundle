@@ -20,7 +20,7 @@ Kaliop Identity Management Bundle
 
 - The firewall depends on two additional services for:
     * communicating to the remote webservice
-    * creating an instance of (a subclass of) Scrip\IdentityManagementBundle\Security\User\RemoteUser when user logs in
+    * creating an instance of (a subclass of) Kaliop\IdentityManagementBundle\Security\User\RemoteUser when user logs in
     * mapping that instance into eZPubish users (creating/updating them on the fly at login time)
 
     The idea is that it should be easy to swap/add remote user services without having to learn the intricate details of
@@ -49,7 +49,7 @@ out of scope (but could be done):
 
 ## How to create a remote-user-provider service
 
-1. create a subclass of Scrip\IdentityManagementBundle\Security\User\RemoteUser
+1. create a subclass of Kaliop\IdentityManagementBundle\Security\User\RemoteUser
 
 2. create a client class, implementing ClientInterface
 
@@ -59,4 +59,4 @@ out of scope (but could be done):
 
 5. create a handler class, which converts the RemoteUser into eZ users
 
-6. add it the the handler map in the service definition of script_identity.security.remoteuser_provider
+6. add it the the handler map in the service definition of kaliop_identity.security.remoteuser_provider
