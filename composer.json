@@ -1,0 +1,18 @@
+{
+  "name": "kaliop/identitymanagementbundle",
+  "description": "Kaliop Identity Management Bundle",
+  "license": "GPL-2.0",
+  "authors": [
+    {
+      "name": "Kaliop",
+      "homepage": "http://stash.kaliop.net/"
+    }
+  ],
+  "require": {
+    "php": ">=5.3.3",
+    "ezsystems/ezpublish-kernel": "*"
+  },
+  "autoload": {
+    "psr-4": {"Kaliop\\IdentityManagementBundle\\": ""}
+  }
+}

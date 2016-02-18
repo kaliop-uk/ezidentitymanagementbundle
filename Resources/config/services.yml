@@ -1,0 +1,84 @@
+parameters:
+    #kaliop_identity.interactive_event_listener.class: Scrip\IdentityManagementBundle\EventListener\InteractiveLoginListener
+
+services:
+
+    ### IP auth
+
+    # The service which maps external IPs to internal users
+    kaliop_identity.security.ip_to_user_mapper:
+        class: Scrip\IdentityManagementBundle\Security\Helper\IpToUserMapper
+        arguments:
+            # Array of IP => user login
+            - %kaliop_ip_login_map%
+
+    # The services implementing IP based auth - abstract, as their concrete implementations are built from a factory
+    # using data from the firewall section of security.yml
+    kaliop_identity.security.authentication.provider.ip:
+        class: Scrip\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
+        arguments:
+            - "" # A mapper service, conforming to IpToUserMapper interface
+            - "" # User provider service
+        abstract: true
+    kaliop_identity.security.authentication.listener.ip:
+        class: Scrip\IdentityManagementBundle\Security\Firewall\IPListener
+        arguments: ["@security.context", "@security.authentication.manager"]
+        abstract: true
+
+    ### RemoteUser auth - the core services
+
+    # The services implementing remote-based auth - abstract, as their concrete implementations are built from a factory
+    # using data from the firewall section of security.yml
+    kaliop_identity.security.authentication.provider.remoteuser:
+        class: Scrip\IdentityManagementBundle\Security\Authentication\Provider\RemoteUserAuthenticationProvider
+        arguments:
+            - "" # A client service. Will be injected from the config of the firewall
+            - "" # A user provider service. Will be injected from the config of the firewall
+            - "" # Firewall id. Will be injected from the config of the firewall
+            - true
+        abstract: true
+    # the security listener is just a plain form-based one
+    kaliop_identity.security.authentication.listener.remoteuser:
+        parent: security.authentication.listener.form
+        abstract: true
+
+    # The service used to load remote users and convert them to eZ users (done via the handlers map below)
+    kaliop_identity.security.remoteuser_provider:
+        class: Scrip\IdentityManagementBundle\Security\User\Provider\RemoteUser
+        arguments:
+            # the client service to talk to the remote system
+            - "@kaliop_identity.remoteuser.client.ams"
+            # the eZ service which loads eZ repo users
+            - "@ezpublish.security.user_provider"
+            # a mapping of RemoteUser classes to handler services
+            -
+                Scrip\IdentityManagementBundle\Adapter\AMS\RemoteUser: @kaliop_identity.security.remoteuser_handler.ams
+
+    # This tagged service is fired when a non-ez security provider is used to log in users
+    kaliop_identity.interactive_event_listener:
+        class: Scrip\IdentityManagementBundle\EventListener\InteractiveLoginListener
+        arguments: [@kaliop_identity.security.remoteuser_provider]
+        tags:
+            - { name: kernel.event_subscriber }
+
+    ### RemoteUser auth - the services specific to a single remote user source
+
+    # The service used to communicate with the AMS
+    kaliop_identity.remoteuser.client.ams:
+        class: Scrip\IdentityManagementBundle\Adapter\AMS\Client
+        arguments: ["@besimple.soap.client.amswebservice", %asmwebservice_site%]
+        calls:
+            - [ setLogger, [ @?logger ] ]
+
+    # The service which creates repo users out of ams users
+    kaliop_identity.security.remoteuser_handler.ams:
+        class: Scrip\IdentityManagementBundle\Adapter\AMS\RemoteUserHandler
+        arguments:
+            - "@kaliop_identity.remoteuser.client.ams"
+            - "@ezpublish.api.repository"
+            -
+                user_contenttype: user
+                company_contenttype: user_group
+                company_namefield: name
+                companies_contentid: 11
+                default_content_language: eng-GB
