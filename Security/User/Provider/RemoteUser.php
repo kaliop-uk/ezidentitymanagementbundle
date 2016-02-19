@@ -15,21 +15,17 @@ use eZ\Publish\Core\MVC\Symfony\Security\User as eZMVCUser;
 
 class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
 {
-    protected $client;
     protected $logger;
     protected $eZUserProvider;
     protected $handlerMap;
 
     /**
-     * @param ClientInterface $client
      * @param $eZUserProvider the user provider to which we actually delegate finding eZ User
-     * @todo !important inject the single services instead of the repo
+     * @param array $handlerMap
      */
-    public function __construct(ClientInterface $client, APIUserProviderInterface $eZUserProvider,
-        array $handlerMap
+    public function __construct(APIUserProviderInterface $eZUserProvider, array $handlerMap
     )
     {
-        $this->client = $client;
         $this->eZUserProvider = $eZUserProvider;
         $this->handlerMap = $handlerMap;
     }
