@@ -1,5 +1,5 @@
 parameters:
-    #kaliop_identity.interactive_event_listener.class: Scrip\IdentityManagementBundle\EventListener\InteractiveLoginListener
+    #kaliop_identity.interactive_event_listener.class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
 
 services:
 
@@ -7,7 +7,7 @@ services:
 
     # The service which maps external IPs to internal users
     kaliop_identity.security.ip_to_user_mapper:
-        class: Scrip\IdentityManagementBundle\Security\Helper\IpToUserMapper
+        class: Kaliop\IdentityManagementBundle\Security\Helper\IpToUserMapper
         arguments:
             # Array of IP => user login
             - %kaliop_ip_login_map%
@@ -15,13 +15,13 @@ services:
     # The services implementing IP based auth - abstract, as their concrete implementations are built from a factory
     # using data from the firewall section of security.yml
     kaliop_identity.security.authentication.provider.ip:
-        class: Scrip\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
+        class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
         arguments:
             - "" # A mapper service, conforming to IpToUserMapper interface
             - "" # User provider service
         abstract: true
     kaliop_identity.security.authentication.listener.ip:
-        class: Scrip\IdentityManagementBundle\Security\Firewall\IPListener
+        class: Kaliop\IdentityManagementBundle\Security\Firewall\IPListener
         arguments: ["@security.context", "@security.authentication.manager"]
         abstract: true
 
@@ -30,7 +30,7 @@ services:
     # The services implementing remote-based auth - abstract, as their concrete implementations are built from a factory
     # using data from the firewall section of security.yml
     kaliop_identity.security.authentication.provider.remoteuser:
-        class: Scrip\IdentityManagementBundle\Security\Authentication\Provider\RemoteUserAuthenticationProvider
+        class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\RemoteUserAuthenticationProvider
         arguments:
             - "" # A client service. Will be injected from the config of the firewall
             - "" # A user provider service. Will be injected from the config of the firewall
@@ -44,7 +44,7 @@ services:
 
     # The service used to load remote users and convert them to eZ users (done via the handlers map below)
     kaliop_identity.security.remoteuser_provider:
-        class: Scrip\IdentityManagementBundle\Security\User\Provider\RemoteUser
+        class: Kaliop\IdentityManagementBundle\Security\User\Provider\RemoteUser
         arguments:
             # the client service to talk to the remote system
             - "@kaliop_identity.remoteuser.client.ams"
@@ -52,11 +52,11 @@ services:
             - "@ezpublish.security.user_provider"
             # a mapping of RemoteUser classes to handler services
             -
-                Scrip\IdentityManagementBundle\Adapter\AMS\RemoteUser: @kaliop_identity.security.remoteuser_handler.ams
+                Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUser: @kaliop_identity.security.remoteuser_handler.ams
 
     # This tagged service is fired when a non-ez security provider is used to log in users
     kaliop_identity.interactive_event_listener:
-        class: Scrip\IdentityManagementBundle\EventListener\InteractiveLoginListener
+        class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
         arguments: [@kaliop_identity.security.remoteuser_provider]
         tags:
             - { name: kernel.event_subscriber }
@@ -65,14 +65,14 @@ services:
 
     # The service used to communicate with the AMS
     kaliop_identity.remoteuser.client.ams:
-        class: Scrip\IdentityManagementBundle\Adapter\AMS\Client
+        class: Kaliop\IdentityManagementBundle\Adapter\AMS\Client
         arguments: ["@besimple.soap.client.amswebservice", %asmwebservice_site%]
         calls:
             - [ setLogger, [ @?logger ] ]
 
     # The service which creates repo users out of ams users
     kaliop_identity.security.remoteuser_handler.ams:
-        class: Scrip\IdentityManagementBundle\Adapter\AMS\RemoteUserHandler
+        class: Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUserHandler
         arguments:
             - "@kaliop_identity.remoteuser.client.ams"
             - "@ezpublish.api.repository"
