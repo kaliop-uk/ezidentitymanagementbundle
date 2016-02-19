@@ -18,16 +18,17 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
     protected $logger;
     protected $eZUserProvider;
     protected $handlerMap;
+    protected $container;
 
     /**
      * @param $eZUserProvider the user provider to which we actually delegate finding eZ User
      * @param array $handlerMap
      */
-    public function __construct(APIUserProviderInterface $eZUserProvider, array $handlerMap
-    )
+    public function __construct(APIUserProviderInterface $eZUserProvider, array $handlerMap, $container)
     {
         $this->eZUserProvider = $eZUserProvider;
         $this->handlerMap = $handlerMap;
+        $this->container = $container;
     }
 
     public function setLogger($logger)
@@ -99,6 +100,6 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
         if (!isset($this->handlerMap[$class])) {
             throw new \Exception("Can not load conversion handler for remote user of class $class");
         }
-        return $this->handlerMap[$class];
+        return $this->container->get($this->handlerMap[$class]);
     }
 }

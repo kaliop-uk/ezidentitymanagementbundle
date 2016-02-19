@@ -5,7 +5,7 @@ parameters:
     kaliop_identity.ip_login_map: []
 
     # The map of remote-user php classes to services handling them, eg:
-    # Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUser: @kaliop_identity.security.remoteuser_handler.ams
+    # Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUser: kaliop_identity.security.remoteuser_handler.ams
     kaliop_identity.remoteuser_service_map: {}
 
 
@@ -59,6 +59,7 @@ services:
             # a mapping of RemoteUser classes to handler services
             -
                 %kaliop_identity.remoteuser_service_map%
+            - "@service_container"
 
     # This tagged service is fired when a non-ez security provider is used to log in users
     kaliop_identity.interactive_event_listener:
