@@ -25,6 +25,8 @@ abstract class RemoteUserHandler
     protected $settings;
     protected $tempFiles = array();
 
+    protected $remoteIdPrefix = 'ldap_md5:';
+
     public function __construct(ClientInterface $client, Repository $repository, array $settings)
     {
         $this->client = $client;
@@ -41,17 +43,19 @@ abstract class RemoteUserHandler
                 //$this->repository->setCurrentUser($userService->loadUser($this->settings['user_creator']));
 
                 $userService = $this->repository->getUserService();
-                $contentTypeService = $this->repository->getContentTypeService();
                 $profile = $user->getProfile();
 
                 // the user passwords we do not store locally
                 $userCreateStruct = $userService->newUserCreateStruct(
                     $user->getUsername(), $user->getEmail(), "TODO: fix this so that these passwords can not be matched anymore",
                     $this->settings['default_content_language'],
-                    $contentTypeService->loadContentTypeByIdentifier($this->settings['user_contenttype'])
+                    $this->repository->getContentTypeService()->loadContentTypeByIdentifier($this->settings['user_contenttype'])
                 );
 
                 $this->setFieldValuesFromProfile($profile, $userCreateStruct);
+
+                // store an md5 of the profile, to allow efficient checking of the need for updates
+                $userCreateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
 
                 $userGroups = $this->getGroupsFromProfile($profile);
                 $repoUser = $userService->createUser($userCreateStruct, $userGroups);
@@ -74,11 +78,17 @@ abstract class RemoteUserHandler
                 function() use ($user, $eZUser)
                 {
                     $userService = $this->repository->getUserService();
+                    $contentService = $this->repository->getContentService();
                     $profile = $user->getProfile();
 
                     $userUpdateStruct = $userService->newUserUpdateStruct();
+                    $contentUpdateStruct = $contentService->newContentUpdateStruct();
+                    $this->setFieldValuesFromProfile($profile, $contentUpdateStruct);
+                    $userUpdateStruct->contentUpdateStruct = $contentUpdateStruct;
 
-                    $this->setFieldValuesFromProfile($profile, $userUpdateStruct);
+                    // update the stored md5 of the profile, to allow efficient checking of the need for updates in the future
+                    $contentMetadataUpdateStruct = $contentService->newContentMetadataUpdateStruct();
+                    $contentMetadataUpdateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
 
                     // we use a transaction since there are multiple db operations
                     try {
@@ -86,9 +96,11 @@ abstract class RemoteUserHandler
 
                         $repoUser = $userService->updateUser($eZUser, $userUpdateStruct);
 
+                        $content = $contentService->updateContentMetadata($repoUser->contentInfo, $contentMetadataUpdateStruct);
+
                         // fix user groups assignments: first remove unsued current ones, then add new ones
                         $newUserGroups = $this->getGroupsFromProfile($profile);
-                        $currentUserGroups = $repoUser->loadUserGroupsOfUser($eZUser);
+                        $currentUserGroups = $userService->loadUserGroupsOfUser($eZUser);
                         foreach($currentUserGroups as $currentUserGroup) {
                             if (!array_key_exists($currentUserGroup->id, $newUserGroups)) {
                                 $userService->unAssignUserFromUserGroup($repoUser, $currentUserGroup);
@@ -112,6 +124,11 @@ abstract class RemoteUserHandler
                 }
             );
         }
+    }
+
+    protected function getRemoteIdFromProfile($profile)
+    {
+
     }
 
     /**
@@ -139,7 +156,7 @@ abstract class RemoteUserHandler
      */
     protected function localUserNeedsUpdating(RemoteUser $remoteUser, $eZUser)
     {
-        return $this->profileHash($remoteUser->getProfile()) !== str_replace('ldap_md5:', '', $eZUser->contentInfo->remoteId);
+        return $this->profileHash($remoteUser->getProfile()) !== str_replace($this->remoteIdPrefix, '', $eZUser->contentInfo->remoteId);
     }
 
     /**

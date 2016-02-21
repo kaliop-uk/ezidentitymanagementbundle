@@ -11,15 +11,17 @@ Kaliop Identity Management Bundle
 
 ## Log In By Remote services
 
-- add ldap handler as an example (it is quite widespread in use after all)
-- add a few more example handlers for common services (twitter/fb/google ? do they all use oauth?)
+- use tagged services for remoteUserHandler definition, to avoid injecting the container
+
+- add ldap handler example (it is quite widespread in use after all)
+
+- add a few more 'example' handlers for common services (twitter/fb/google ? do they all use oauth?)
 
 - to do: test: does ez native auth mechanism kick in before the remote one? If so ...
 - to do: make sure remote users can not log in into eZ with the hardcoded password (see RemoteUserHandler)
-- to do: update eZ users if their profile has been updated, at login time (save md5 of them in the user itself)
 - to do: store the password encrypted in the RemoteUser instead of plaintext
-- to do: store in the eZ users the remote-id from the remote service, just in case
-- to do: move config from parameters to semantic, to avoid injecting the container
+- to do: store in the eZ users the remote-id from the remote service, just in case (done per-handler...)
+- to do: move ldap config from settings to semantic, for validation
 - to do: check if it is a good idea to remove the 'remoteuser' provider in app/security.yml. Remoteusers after all are
          not meant to be used as actual logged in users anyway
 - to do: add support for forgotpassword
