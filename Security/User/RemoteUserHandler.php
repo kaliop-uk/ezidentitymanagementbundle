@@ -1,6 +1,6 @@
 <?php
 
-namespace  Kaliop\IdentityManagementBundle\Adapter\LDAP;
+namespace  Kaliop\IdentityManagementBundle\User;
 
 use Kaliop\IdentityManagementBundle\Adapter\ClientInterface;
 use eZ\Publish\API\Repository\Repository;
@@ -9,7 +9,7 @@ use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\API\Repository\Values\User\User;
 
 /**
- * A 'generic' LDAP Remote user handler class.
+ * A 'generic' Remote user handler class.
  *
  * For the common cases, you will need to implement only getGroupsFromProfile() and setFieldValuesFromProfile().
  * But you can subclass more methods for more complex scenarios :-)
@@ -134,14 +134,14 @@ abstract class RemoteUserHandler
     /**
      * Load (and possibly create on the fly) all the user groups needed for this user, based on his profile.
      *
-     * @param array $profile
+     * @param $profile
      * @return \eZ\Publish\API\Repository\Values\User\UserGroup[] indexed by group id
      */
     abstract protected function getGroupsFromProfile($profile);
 
     /**
-     * @param array $profile
-     * @param $userCreateStruct either a create or an update stuct
+     * @param $profile
+     * @param \eZ\Publish\API\Repository\Values\Content\ContentCreateStruct $userCreateStruct
      *
      * @todo allow to define simple field mappings in settings
      */
@@ -161,7 +161,7 @@ abstract class RemoteUserHandler
 
     /**
      * Generates a unique hash for the user profile
-     * @param array $profile
+     * @param $profile
      * @return string
      */
     protected function profileHash($profile)
