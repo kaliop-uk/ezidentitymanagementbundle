@@ -70,22 +70,5 @@ services:
 
     ### RemoteUser auth - the services specific to a single remote user source
 
-    # The service used to communicate with the AMS
-    #kaliop_identity.remoteuser.client.ams:
-    #    class: Kaliop\IdentityManagementBundle\Adapter\AMS\Client
-    #    arguments: ["@besimple.soap.client.amswebservice", %asmwebservice_site%]
-    #    calls:
-    #        - [ setLogger, [ @?logger ] ]
+    # LDAP example
 
-    # The service which creates repo users out of ams users
-    #kaliop_identity.security.remoteuser_handler.ams:
-    #    class: Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUserHandler
-    #    arguments:
-    #        - "@kaliop_identity.remoteuser.client.ams"
-    #        - "@ezpublish.api.repository"
-    #        -
-    #            user_contenttype: user
-    #            company_contenttype: user_group
-    #            company_namefield: name
-    #            companies_contentid: 11
-    #            default_content_language: eng-GB

@@ -27,8 +27,6 @@ class KaliopIdentityManagementExtension extends Extension
             new FileLocator( __DIR__ . '/../Resources/config' )
         );
 
-        // Base services override
-        $loader->load( 'security.yml' );
         // New services
         $loader->load( 'services.yml' );
     }

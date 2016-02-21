@@ -1,7 +1,0 @@
-parameters:
-    # take over the default user provider - to log him in other ways than login field
-    ezpublish.security.user_provider.class: Kaliop\IdentityManagementBundle\Security\User\Provider\EmailUser
-    # take over the auth provider as well, in accord
-    security.authentication.provider.dao.class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\RepositoryAuthenticationProvider
-
-services:
