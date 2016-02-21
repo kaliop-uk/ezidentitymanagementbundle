@@ -57,6 +57,7 @@ abstract class RemoteUserHandler
                 // store an md5 of the profile, to allow efficient checking of the need for updates
                 $userCreateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
 
+                /// @todo test what happens when we get an empty array...
                 $userGroups = $this->getGroupsFromProfile($profile);
                 $repoUser = $userService->createUser($userCreateStruct, $userGroups);
 
@@ -98,7 +99,8 @@ abstract class RemoteUserHandler
 
                         $content = $contentService->updateContentMetadata($repoUser->contentInfo, $contentMetadataUpdateStruct);
 
-                        // fix user groups assignments: first remove unsued current ones, then add new ones
+                        // fix user groups assignments: first remove unused current ones, then add new ones
+                        /// @todo test what happens when we get an empty array...
                         $newUserGroups = $this->getGroupsFromProfile($profile);
                         $currentUserGroups = $userService->loadUserGroupsOfUser($eZUser);
                         foreach($currentUserGroups as $currentUserGroup) {
