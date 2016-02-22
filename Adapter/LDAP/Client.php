@@ -55,14 +55,16 @@ class Client implements ClientInterface
             $username = $this->ldap->escape($username, '', LDAP_ESCAPE_FILTER);
             $query = str_replace('{username}', $username, $this->settings['filter']);
             if (isset($this->settings['attributes']) and count($this->settings['attributes'])) {
-                $search = $this->ldap->find($this->baseDn, $query, $this->settings['attributes']);
+                $search = $this->ldap->find($this->settings['base_dn'], $query, $this->settings['attributes']);
             } else {
-                $search = $this->ldap->find($this->baseDn, $query);
+                $search = $this->ldap->find($this->settings['base_dn'], $query);
             }
 
         } catch (ConnectionException $e) {
             /// @todo shall we log an error ?
             throw new AuthenticationServiceException(sprintf('Connection error "%s"', $e->getMessage()), 0, $e);
+        } catch (\Exception $e) {
+            throw new AuthenticationServiceException(sprintf('Internal error "%s"', $e->getMessage()), 0, $e);
         }
 
         if (!$search) {
