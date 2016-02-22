@@ -192,7 +192,8 @@ abstract class RemoteUserHandler
     protected function cleanUpAfterUserCreation()
     {
         foreach ($this->tempFiles as $fileName) {
-            unlink($fileName);
+            if (is_file( $fileName))
+                unlink($fileName);
         }
     }
 
@@ -202,7 +203,8 @@ abstract class RemoteUserHandler
     protected function cleanUpAfterUserUpdate()
     {
         foreach ($this->tempFiles as $fileName) {
-            unlink($fileName);
+            if (is_file( $fileName))
+                unlink($fileName);
         }
     }
 }
