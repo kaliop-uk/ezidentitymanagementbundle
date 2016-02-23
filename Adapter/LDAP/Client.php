@@ -61,17 +61,25 @@ class Client implements ClientInterface
             }
 
         } catch (ConnectionException $e) {
+            if ($this->logger) $this->logger->error(sprintf('Connection error "%s"', $e->getMessage()));
+
             /// @todo shall we log an error ?
             throw new AuthenticationServiceException(sprintf('Connection error "%s"', $e->getMessage()), 0, $e);
         } catch (\Exception $e) {
+            if ($this->logger) $this->logger->error(sprintf('Unexpected error "%s"', $e->getMessage()));
+
             throw new AuthenticationServiceException(sprintf('Internal error "%s"', $e->getMessage()), 0, $e);
         }
 
         if (!$search) {
+            if ($this->logger) $this->logger->info("User not found");
+
             throw new BadCredentialsException(sprintf('User "%s" not found.', $username));
         }
 
         if ($search['count'] > 1) {
+            if ($this->logger) $this->logger->warning('More than one ldap account found for ' . $username);
+
             throw new AuthenticationServiceException('More than one user found');
         }
 
