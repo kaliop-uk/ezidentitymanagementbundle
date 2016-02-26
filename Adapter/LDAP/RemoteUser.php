@@ -59,6 +59,16 @@ class RemoteUser extends BaseRemoteUser
     }
 
     /**
+     * No profile validation by default - we do not throw any exception
+     *
+     * @param array $profile
+     * @return null
+     */
+    public static function validateProfile($profile)
+    {
+    }
+
+    /**
      * Transforms the data received from an LDAP query into a more 'normal' php array by removing redundant stuff.
      * NB: assumes a well-formed array
      *

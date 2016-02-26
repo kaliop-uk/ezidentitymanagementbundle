@@ -83,6 +83,14 @@ class Client implements ClientInterface
             throw new AuthenticationServiceException('More than one user found');
         }
 
+        try {
+            RemoteUser::validateProfile($search[0]);
+        } catch (\Exception $e) {
+            if ($this->logger) $this->logger->warning('Invalid user profile: '.$e->getMessage());
+
+            throw new AuthenticationServiceException('Invalid user profile: '.$e->getMessage());
+        }
+
         if ($this->logger) $this->logger->info("Remote user found, attempting authentication for user: '$username'");
 
         try {

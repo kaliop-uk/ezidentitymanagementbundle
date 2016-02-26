@@ -82,20 +82,14 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
     {
         $repoUser = null;
 
+        // does eZ user exist? If not, create it, else update it
         try {
-            // does eZ user exist? If not, create it, else update it
-            try {
-                $mvcUser = $this->eZUserProvider->loadUserByUsername($remoteUser->getUsername());
-                $repoUser = $mvcUser->getAPIUser();
-                $this->getHandler($remoteUser)->updateRepoUser($remoteUser, $repoUser);
-            } catch (UsernameNotFoundException $e) {
-                // we have to create an eZ MVC user out of an eZ Repo user
-                $repoUser = $this->getHandler($remoteUser)->createRepoUser($remoteUser);
-            }
-
-        // we catch ANY exception thrown by custom project code, as the method sig does not allow them
-        } catch(\Exception $e) {
-            if ($this->logger) $this->logger->error('Unexpected error while creating/updating ez user: ' . $e->getMessage());
+            $mvcUser = $this->eZUserProvider->loadUserByUsername($remoteUser->getUsername());
+            $repoUser = $mvcUser->getAPIUser();
+            $this->getHandler($remoteUser)->updateRepoUser($remoteUser, $repoUser);
+        } catch (UsernameNotFoundException $e) {
+            // we have to create an eZ MVC user out of an eZ Repo user
+            $repoUser = $this->getHandler($remoteUser)->createRepoUser($remoteUser);
         }
 
         return $repoUser;
