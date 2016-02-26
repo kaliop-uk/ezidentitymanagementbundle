@@ -102,4 +102,11 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
         }
         return $this->container->get($this->handlerMap[$class]);
     }
+
+    protected function getHandlerForClass($class) {
+        if (!isset($this->handlerMap[$class])) {
+            throw new \Exception("Can not load conversion handler for remote user of class $class");
+        }
+        return $this->container->get($this->handlerMap[$class]);
+    }
 }

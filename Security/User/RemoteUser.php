@@ -16,15 +16,6 @@ abstract class RemoteUser implements UserInterface
 
     abstract public function getRoles();
 
-    /**
-     * Called before the actual user object is created, with data gotten from the remote service
-     *
-     * @param $profile
-     * @return null
-     * @throws \Exception if the profile retrieved from the remote service is invalid, eg. misses mandatory data
-     */
-    abstract public static function validateProfile($profile);
-
     public function getProfile()
     {
         return $this->profile;

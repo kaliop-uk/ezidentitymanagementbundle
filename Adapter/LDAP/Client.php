@@ -84,7 +84,7 @@ class Client implements ClientInterface
         }
 
         try {
-            RemoteUser::validateProfile($search[0]);
+            $this->validateLdapResults($search[0]);
         } catch (\Exception $e) {
             if ($this->logger) $this->logger->warning('Invalid user profile: '.$e->getMessage());
 
@@ -115,5 +115,15 @@ class Client implements ClientInterface
         }
 
         return new RemoteUser($search[0], $this->settings['email_attribute'], $username, $password);
+    }
+
+    /**
+     * To be overridden in subclasses. Validates the ldap results so that later user creation/update shall not fail
+     * @param array $data
+     * @return null
+     * @throw \Exception
+     */
+    protected function validateLdapResults(array $data)
+    {
     }
 }

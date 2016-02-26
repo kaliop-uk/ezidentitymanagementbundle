@@ -1,6 +1,6 @@
 <?php
 
-namespace  Kaliop\IdentityManagementBundle\Adapter\LDAP;
+namespace Kaliop\IdentityManagementBundle\Adapter\LDAP;
 
 use Kaliop\IdentityManagementBundle\Security\User\RemoteUser as BaseRemoteUser;
 
@@ -56,16 +56,6 @@ class RemoteUser extends BaseRemoteUser
     public function getProfile()
     {
         return parent::getProfile();
-    }
-
-    /**
-     * No profile validation by default - we do not throw any exception
-     *
-     * @param array $profile
-     * @return null
-     */
-    public static function validateProfile($profile)
-    {
     }
 
     /**
