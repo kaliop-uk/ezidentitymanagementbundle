@@ -1,6 +1,6 @@
 <?php
 
-namespace  Kaliop\IdentityManagementBundle\Adapter\LDAP;
+namespace Kaliop\IdentityManagementBundle\Adapter\LDAP;
 
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Ldap\LdapClientInterface;

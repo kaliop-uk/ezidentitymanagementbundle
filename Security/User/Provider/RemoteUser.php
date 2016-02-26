@@ -82,6 +82,14 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
     {
         $repoUser = null;
 
+        // NB: it would be nice to be able to wrap these calls in a try/catch block to fix any error during ez user
+        //     account creation, and simply disallow login.
+        //     Unfortunately, it seems that if at this stage we return null, the Sf session will be set to a logged-in
+        //     user, while eZP will think that it is an anon user. I tried to fix the Sf session so as to prevent the
+        //     user from being logged in, without success.
+        //     This forces the developer to do validation of the user profile adta gotten from the remote service inside
+        //     the client code, which is not as logical/clean...
+
         // does eZ user exist? If not, create it, else update it
         try {
             $mvcUser = $this->eZUserProvider->loadUserByUsername($remoteUser->getUsername());
@@ -103,7 +111,16 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
         return $this->container->get($this->handlerMap[$class]);
     }
 
-    protected function getHandlerForClass($class) {
+    /**
+     * A courtesy method, if some other service wants to retrieve a remote-user handler for a given php class.
+     * Useful to retrieve the remote-user handler before the actual creation of the actual remote-user object, which
+     * allows f.e. to put in the remote-user handler some validation code
+     *
+     * @param string $class a php class name
+     * @return mixed
+     * @throws \Exception
+     */
+    public function getHandlerForClass($class) {
         if (!isset($this->handlerMap[$class])) {
             throw new \Exception("Can not load conversion handler for remote user of class $class");
         }

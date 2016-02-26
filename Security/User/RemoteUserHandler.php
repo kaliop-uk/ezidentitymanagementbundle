@@ -1,6 +1,6 @@
 <?php
 
-namespace  Kaliop\IdentityManagementBundle\Security\User;
+namespace Kaliop\IdentityManagementBundle\Security\User;
 
 use Kaliop\IdentityManagementBundle\Adapter\ClientInterface;
 use eZ\Publish\API\Repository\Repository;
