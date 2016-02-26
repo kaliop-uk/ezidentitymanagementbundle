@@ -99,7 +99,11 @@ class Client implements ClientInterface
 
         // allow ldap to give us back the actual login field. It might be different because of dashes, spaces, case...
         if (isset($this->settings['login_attribute']) && isset($search[0][$this->settings['login_attribute']][0])) {
-            $username = $search[0][$this->settings['email_attribute']][0];
+            if ($username != $search[0][$this->settings['login_attribute']][0]) {
+                $username = $search[0][$this->settings['login_attribute']][0];
+
+                if ($this->logger) $this->logger->info("Renamed user to: '$username'");
+            }
         }
 
         return new RemoteUser($search[0], $this->settings['email_attribute'], $username, $password);
