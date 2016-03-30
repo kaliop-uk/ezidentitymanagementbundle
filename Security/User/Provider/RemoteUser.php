@@ -21,7 +21,7 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
     protected $container;
 
     /**
-     * @param $eZUserProvider the user provider to which we actually delegate finding eZ User
+     * @param APIUserProviderInterface $eZUserProvider the user provider to which we actually delegate finding eZ User
      * @param array $handlerMap
      */
     public function __construct(APIUserProviderInterface $eZUserProvider, array $handlerMap, $container)

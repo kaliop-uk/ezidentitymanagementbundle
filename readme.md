@@ -94,6 +94,8 @@ Contributions are welcome :-)
                         - title
                     # The name of the ldap attribute used to hold the user email
                     email_attribute: mail
+                    # The name of attribute used to log-in to ldap and validate the password
+                    ldap_login_attribute: mail
             calls:
                 - [ setLogger, [ @?logger ] ]
 

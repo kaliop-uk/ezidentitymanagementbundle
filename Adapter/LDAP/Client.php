@@ -83,10 +83,17 @@ class Client implements ClientInterface
             throw new AuthenticationServiceException('More than one user found');
         }
 
+        // always carry out this check, as the data is needed to log in
+        if (!isset($this->settings['ldap_login_attribute']) || !isset($search[0][$this->settings['ldap_login_attribute']][0])) {
+            if ($this->logger) $this->logger->info("Authentication failed for user: '$username', missing attribute used to log in to ldap: " . @$this->settings['ldap_login_attribute']);
+
+            throw new AuthenticationServiceException('Invalid user profile: missing ldap attribute needed for log-in');
+        }
+
         try {
             $this->validateLdapResults($search[0]);
         } catch (\Exception $e) {
-            if ($this->logger) $this->logger->warning('Invalid user profile: '.$e->getMessage());
+            if ($this->logger) $this->logger->warning('Invalid user profile for user: \'$username\': '.$e->getMessage());
 
             throw new AuthenticationServiceException('Invalid user profile: '.$e->getMessage());
         }
@@ -94,23 +101,23 @@ class Client implements ClientInterface
         if ($this->logger) $this->logger->info("Remote user found, attempting authentication for user: '$username'");
 
         try {
-            $username = $this->ldap->escape($username, '', LDAP_ESCAPE_DN);
-            $dn = str_replace('{username}', $username, $this->settings['filter']);
-
-            $this->ldap->bind($dn, $password);
-
+            $this->ldap->bind($search[0][$this->settings['ldap_login_attribute']][0], $password);
         } catch (ConnectionException $e) {
+            if ($this->logger) $this->logger->info("Authentication failed for user: '$username', bind failed: ".$e->getMessage());
             throw new BadCredentialsException('The presented password is invalid.');
+        } catch (\Exception $e) {
+            if ($this->logger) $this->logger->info("Authentication failed for user: '$username', unexpected ldap error: ".$e->getMessage());
+            throw new AuthenticationServiceException('Unexpected exception: '.$e->getMessage());
         }
 
         if ($this->logger) $this->logger->info("Authentication succeeded for user: '$username'");
 
-        // allow ldap to give us back the actual login field. It might be different because of dashes, spaces, case...
+        // allow ldap to give us back the actual login field to be used in eZ. It might be different because of dashes, spaces, case...
         if (isset($this->settings['login_attribute']) && isset($search[0][$this->settings['login_attribute']][0])) {
             if ($username != $search[0][$this->settings['login_attribute']][0]) {
-                $username = $search[0][$this->settings['login_attribute']][0];
+                if ($this->logger) $this->logger->info("Renamed user '$username' to '{$search[0][$this->settings['login_attribute']][0]}'");
 
-                if ($this->logger) $this->logger->info("Renamed user to: '$username'");
+                $username = $search[0][$this->settings['login_attribute']][0];
             }
         }
 
