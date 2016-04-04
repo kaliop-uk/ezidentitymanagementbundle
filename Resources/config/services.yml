@@ -18,7 +18,7 @@ services:
         class: Kaliop\IdentityManagementBundle\Security\Helper\IpToUserMapper
         arguments:
             # Array of IP => user login
-            - %kaliop_identity.ip_login_map%
+            - "%kaliop_identity.ip_login_map%"
 
     # The services implementing IP based auth - abstract, as their concrete implementations are built from a factory
     # using data from the firewall section of security.yml
@@ -58,13 +58,13 @@ services:
             - "@ezpublish.security.user_provider"
             # a mapping of RemoteUser classes to handler services
             -
-                %kaliop_identity.remoteuser_service_map%
+                "%kaliop_identity.remoteuser_service_map%"
             - "@service_container"
 
     # This tagged service is fired when a non-ez security provider is used to log in users
     kaliop_identity.interactive_event_listener:
         class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
-        arguments: [@kaliop_identity.security.remoteuser_provider]
+        arguments: ["@kaliop_identity.security.remoteuser_provider"]
         tags:
             - { name: kernel.event_subscriber }
 

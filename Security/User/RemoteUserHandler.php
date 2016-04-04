@@ -34,6 +34,10 @@ abstract class RemoteUserHandler
         $this->settings = $settings;
     }
 
+    /**
+     * @param RemoteUser $user
+     * @return \eZ\Publish\API\Repository\Values\User\User
+     */
     public function createRepoUser(RemoteUser $user)
     {
         return $this->repository->sudo(
@@ -179,7 +183,7 @@ abstract class RemoteUserHandler
      */
     protected function createTempFile($data, $prefix='')
     {
-        $imageFileName = tempnam(sys_get_temp_dir(), $prefix);
+        $imageFileName = trim(tempnam(sys_get_temp_dir(), $prefix), '.');
         file_put_contents($imageFileName, $data);
         $this->tempFiles[] = $imageFileName;
 
