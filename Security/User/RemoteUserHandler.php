@@ -61,7 +61,7 @@ abstract class RemoteUserHandler
                 // store an md5 of the profile, to allow efficient checking of the need for updates
                 $userCreateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
 
-                /// @todo test what happens when we get an empty array...
+                /// @todo test/document what happens when we get an empty array...
                 $userGroups = $this->getGroupsFromProfile($profile);
                 $repoUser = $userService->createUser($userCreateStruct, $userGroups);
 
@@ -103,19 +103,23 @@ abstract class RemoteUserHandler
 
                         $content = $contentService->updateContentMetadata($repoUser->contentInfo, $contentMetadataUpdateStruct);
 
-                        // fix user groups assignments: first remove unused current ones, then add new ones
-                        /// @todo test what happens when we get an empty array...
+                        // fix user groups assignments: first add new ones, then remove unused current ones (we can not hit 0 groups during the updating :-) )
+                        /// @todo test/document what happens when we get an empty array...
                         $newUserGroups = $this->getGroupsFromProfile($profile);
                         $currentUserGroups = $userService->loadUserGroupsOfUser($eZUser);
+                        $groupsToRemove = array();
                         foreach($currentUserGroups as $currentUserGroup) {
                             if (!array_key_exists($currentUserGroup->id, $newUserGroups)) {
-                                $userService->unAssignUserFromUserGroup($repoUser, $currentUserGroup);
+                                $groupsToRemove[] = $currentUserGroup;
                             } else {
                                 unset($newUserGroups[$currentUserGroup->id]);
                             }
                         }
                         foreach ($newUserGroups as $newUserGroup) {
                             $userService->assignUserToUserGroup($repoUser, $newUserGroup);
+                        }
+                        foreach ($groupsToRemove as $groupToRemove) {
+                            $userService->unAssignUserFromUserGroup($repoUser, $groupToRemove);
                         }
 
                         $this->repository->commit();
