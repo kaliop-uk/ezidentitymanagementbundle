@@ -1,5 +1,5 @@
 <?php /*
 
 [UserSettings]
-ExtensionDirectory[]=identitymanahgementextension
+ExtensionDirectory[]=identitymanagementextension
 LoginHandler[]=RemoteUserLogin
