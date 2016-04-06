@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<software>
+    <metadata>
+        <name>Kaliop Identity Managent Extension</name>
+        <version></version>
+        <copyright></copyright>
+    </metadata>
+    <dependencies>
+    </dependencies>
+</software>
