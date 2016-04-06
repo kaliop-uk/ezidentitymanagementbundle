@@ -6,6 +6,7 @@ An eZ5 bundle designed to cater all your needs for custom user authentication sc
 - log in user using his email instead of login
 - get user accounts from an LDAP server (including MS Active Directory)
 - get user accounts from an external service (needs custom code)
+- allow logging in to the eZ backoffice using the customized symfony login handlers
 
 The base idea is that it should be easy to swap/add remote user services without having to learn the intricate details of
 the Symfony auth component (firewall/authenticator/userprovider/factory).
@@ -14,7 +15,7 @@ As such, the logic of the 'ldap login handler' from eZP4 is replicated:
 1. when the user tries to log in the 1st time, retrieve his profile on the remote system, and create a corresponding eZ user on the fly
 2. when the user tries to log in after the 1st time, retrieve his profile on the remote system, and update the corresponding eZ user if needed
 
-A lot of nice bits are still missing, but the bundle should be sufficient to get started with simple LDAP integrations.
+Some nice bits are still missing, but the bundle should be sufficient to get started with simple LDAP integrations.
 
 Contributions are welcome :-)
 
@@ -138,6 +139,14 @@ Contributions are welcome :-)
                 require_previous_session: false
             logout: ~
 
+
+### Allowing remote-service login to the Legacy Admin interface
+
+1. enable the identitymangementextension extension (bundled in this bundle)
+
+2. if you have renamed the firewall in security.yml to anything but ezpublish_front, set up identitymanagement.ini.append.php
+
+3. clear caches, test, done!
 
 ### Advanced usage
 

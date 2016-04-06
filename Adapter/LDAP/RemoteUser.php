@@ -32,12 +32,12 @@ class RemoteUser extends BaseRemoteUser
     }
 
     /**
-     * SF roles
+     * SF roles. Important: not to have this empty, otherwise SF will think this user is not an authenticated one
      * @return array
      */
     public function getRoles()
     {
-        return array();
+        return array('ROLE_USER');
     }
 
     /**
