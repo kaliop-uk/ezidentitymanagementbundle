@@ -10,7 +10,8 @@
   ],
   "require": {
     "php": ">=5.3.3",
-    "ezsystems/ezpublish-kernel": "*"
+    "ezsystems/ezpublish-kernel": "*",
+    "paragonie/random_compat": "^2.0.1"
   },
   "autoload": {
     "psr-4": {"Kaliop\\IdentityManagementBundle\\": ""}

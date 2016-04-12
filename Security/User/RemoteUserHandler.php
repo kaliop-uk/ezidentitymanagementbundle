@@ -51,7 +51,8 @@ abstract class RemoteUserHandler
 
                 // the user passwords we do not store locally
                 $userCreateStruct = $userService->newUserCreateStruct(
-                    $user->getUsername(), $user->getEmail(), "TODO: fix this so that these passwords can not be matched anymore",
+                    // is 128 bytes enough for everyone? (pun intended)
+                    $user->getUsername(), $user->getEmail(), bin2hex(random_bytes(128)),
                     $this->settings['default_content_language'],
                     $this->repository->getContentTypeService()->loadContentTypeByIdentifier($this->settings['user_contenttype'])
                 );
