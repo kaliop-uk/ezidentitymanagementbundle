@@ -6,12 +6,13 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Kaliop\IdentityManagementBundle\Adapter\ClientInterface;
 use Kaliop\IdentityManagementBundle\Security\User\AMSUser as UserClass;
 use Kaliop\IdentityManagementBundle\Security\User\RemoteUserProviderInterface;
 use Kaliop\IdentityManagementBundle\Security\User\RemoteUser as KaliopRemoteUser;
+use Kaliop\IdentityManagementBundle\Security\User\RemoteUserHandlerInterface;
 use eZ\Publish\Core\MVC\Symfony\Security\User\APIUserProviderInterface;
 use eZ\Publish\Core\MVC\Symfony\Security\User as eZMVCUser;
+use Psr\Log\LoggerInterface;
 
 class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
 {
@@ -31,7 +32,7 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
         $this->container = $container;
     }
 
-    public function setLogger($logger)
+    public function setLogger(LoggerInterface $logger)
     {
         $this->logger = $logger;
     }
@@ -81,29 +82,39 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
     public function loadAPIUserByRemoteUser(KaliopRemoteUser $remoteUser)
     {
         $repoUser = null;
+        $userHandler = $this->getHandler($remoteUser);
 
+        // does eZ user exist? If not, create it, else update it
         // NB: it would be nice to be able to wrap these calls in a try/catch block to fix any error during ez user
-        //     account creation, and simply disallow login.
+        //     account creation/update, and simply disallow login.
         //     Unfortunately, it seems that if at this stage we return null, the Sf session will be set to a logged-in
         //     user, while eZP will think that it is an anon user. I tried to fix the Sf session so as to prevent the
         //     user from being logged in, without success.
-        //     This forces the developer to do validation of the user profile adta gotten from the remote service inside
+        //     This forces the developer to do validation of the user profile data gotten from the remote service inside
         //     the client code, which is not as logical/clean...
-
-        // does eZ user exist? If not, create it, else update it
         try {
-            $mvcUser = $this->eZUserProvider->loadUserByUsername($remoteUser->getUsername());
-            $repoUser = $mvcUser->getAPIUser();
-            $this->getHandler($remoteUser)->updateRepoUser($remoteUser, $repoUser);
-        } catch (UsernameNotFoundException $e) {
-            // we have to create an eZ MVC user out of an eZ Repo user
-            $repoUser = $this->getHandler($remoteUser)->createRepoUser($remoteUser);
+            $repoUser = $userHandler->loadAPIUserByRemoteUser($remoteUser);
+            if ($repoUser === false) {
+                // we have to create an eZ MVC user out of an eZ Repo user
+                $repoUser = $userHandler->createRepoUser($remoteUser);
+            } else {
+                $userHandler->updateRepoUser($remoteUser, $repoUser);
+            }
+        } catch (\Exception $e) {
+            if ($this->logger) $this->logger->error("Unexpected error while finding/creating/updating repo user from data gotten from remote service");
+            throw $e;
         }
 
         return $repoUser;
     }
 
-    protected function getHandler($remoteUser) {
+    /**
+     * @param KaliopRemoteUser $remoteUser
+     * @return RemoteUserHandlerInterface
+     * @throws \Exception
+     */
+    protected function getHandler($remoteUser)
+    {
         $class = get_class($remoteUser);
         if (!isset($this->handlerMap[$class])) {
             throw new \Exception("Can not load conversion handler for remote user of class $class");
@@ -117,10 +128,11 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
      * allows f.e. to put in the remote-user handler some validation code
      *
      * @param string $class a php class name
-     * @return mixed
+     * @return RemoteUserHandlerInterface
      * @throws \Exception
      */
-    public function getHandlerForClass($class) {
+    public function getHandlerForClass($class)
+    {
         if (!isset($this->handlerMap[$class])) {
             throw new \Exception("Can not load conversion handler for remote user of class $class");
         }

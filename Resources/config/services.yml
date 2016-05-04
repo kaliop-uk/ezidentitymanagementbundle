@@ -1,5 +1,11 @@
 parameters:
     #kaliop_identity.interactive_event_listener.class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
+    kaliop_identity.security.ip_to_user_mapper.class: Kaliop\IdentityManagementBundle\Security\Helper\IpToUserMapper
+    kaliop_identity.security.authentication.provider.ip: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
+    kaliop_identity.security.authentication.listener.ip.class: Kaliop\IdentityManagementBundle\Security\Firewall\IPListener
+    kaliop_identity.security.authentication.provider.remoteuser.class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\RemoteUserAuthenticationProvider
+    kaliop_identity.security.remoteuser_provider.class: Kaliop\IdentityManagementBundle\Security\User\Provider\RemoteUser
+    kaliop_identity.interactive_event_listener.class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
 
     # Used for ip-based login
     kaliop_identity.ip_login_map: []
@@ -15,7 +21,7 @@ services:
 
     # The service which maps external IPs to internal users
     kaliop_identity.security.ip_to_user_mapper:
-        class: Kaliop\IdentityManagementBundle\Security\Helper\IpToUserMapper
+        class: "%kaliop_identity.security.ip_to_user_mapper.class%"
         arguments:
             # Array of IP => user login
             - "%kaliop_identity.ip_login_map%"
@@ -23,13 +29,13 @@ services:
     # The services implementing IP based auth - abstract, as their concrete implementations are built from a factory
     # using data from the firewall section of security.yml
     kaliop_identity.security.authentication.provider.ip:
-        class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
+        class: "%kaliop_identity.security.authentication.listener.ip.class%"
         arguments:
             - "" # A mapper service, conforming to IpToUserMapper interface
             - "" # User provider service
         abstract: true
     kaliop_identity.security.authentication.listener.ip:
-        class: Kaliop\IdentityManagementBundle\Security\Firewall\IPListener
+        class: "%kaliop_identity.security.authentication.listener.ip.class%"
         arguments: ["@security.context", "@security.authentication.manager"]
         abstract: true
 
@@ -38,7 +44,7 @@ services:
     # The services implementing remote-based auth - abstract, as their concrete implementations are built from a factory
     # using data from the firewall section of security.yml
     kaliop_identity.security.authentication.provider.remoteuser:
-        class: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\RemoteUserAuthenticationProvider
+        class: "%kaliop_identity.security.authentication.provider.remoteuser.class%"
         arguments:
             - "" # A client service. Will be injected from the config of the firewall
             - "" # A user provider service. Will be injected from the config of the firewall
@@ -52,7 +58,7 @@ services:
 
     # The service used to load remote users and convert them to eZ users (done via the handlers map below)
     kaliop_identity.security.remoteuser_provider:
-        class: Kaliop\IdentityManagementBundle\Security\User\Provider\RemoteUser
+        class: "%kaliop_identity.security.remoteuser_provider%"
         arguments:
             # the eZ service which loads eZ repo users
             - "@ezpublish.security.user_provider"
@@ -63,7 +69,7 @@ services:
 
     # This tagged service is fired when a non-ez security provider is used to log in users
     kaliop_identity.interactive_event_listener:
-        class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
+        class: "%kaliop_identity.interactive_event_listener.class%"
         arguments: ["@kaliop_identity.security.remoteuser_provider"]
         tags:
             - { name: kernel.event_subscriber }

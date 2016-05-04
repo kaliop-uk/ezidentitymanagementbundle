@@ -7,6 +7,7 @@ use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\API\Repository\Values\Content\Query;
 use eZ\Publish\API\Repository\Values\Content\Query\Criterion;
 use eZ\Publish\API\Repository\Values\User\User;
+use eZ\Publish\API\Repository\Exceptions\NotFoundException;
 
 /**
  * A 'generic' Remote user handler class.
@@ -18,7 +19,7 @@ use eZ\Publish\API\Repository\Values\User\User;
  * - multiple user groups assignments per user
  * - automatic update of the ez user when its ldap profile has changed compared to the stored one
  */
-abstract class RemoteUserHandler
+abstract class RemoteUserHandler implements RemoteUserHandlerInterface
 {
     protected $client;
     protected $repository;
@@ -27,11 +28,35 @@ abstract class RemoteUserHandler
 
     protected $remoteIdPrefix = 'ldap_md5:';
 
+    /**
+     * @param ClientInterface $client Note: this is currently unused and left in for BC
+     * @param Repository $repository
+     * @param array $settings
+     */
     public function __construct(ClientInterface $client, Repository $repository, array $settings)
     {
         $this->client = $client;
         $this->repository = $repository;
         $this->settings = $settings;
+    }
+
+    /**
+     * Returns the API user corresponding to a given remoteUser (if it exists), or false.
+     * @see \eZ\Publish\Core\MVC\Symfony\Security\User\Provider::loadUserByUsername()
+     *
+     * @param RemoteUser $remoteUser
+     * @return \eZ\Publish\API\Repository\Values\User\User|false
+     */
+    public function loadAPIUserByRemoteUser(RemoteUser $remoteUser)
+    {
+        try
+        {
+            return $this->repository->getUserService()->loadUserByLogin($remoteUser->getUsername());
+        }
+        catch (NotFoundException $e)
+        {
+            return false;
+        }
     }
 
     /**
@@ -60,7 +85,7 @@ abstract class RemoteUserHandler
                 $this->setFieldValuesFromProfile($profile, $userCreateStruct);
 
                 // store an md5 of the profile, to allow efficient checking of the need for updates
-                $userCreateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
+                $userCreateStruct->remoteId = $this->getRemoteIdFromProfile($profile);
 
                 /// @todo test/document what happens when we get an empty array...
                 $userGroups = $this->getGroupsFromProfile($profile);
@@ -94,7 +119,7 @@ abstract class RemoteUserHandler
 
                     // update the stored md5 of the profile, to allow efficient checking of the need for updates in the future
                     $contentMetadataUpdateStruct = $contentService->newContentMetadataUpdateStruct();
-                    $contentMetadataUpdateStruct->remoteId = $this->remoteIdPrefix . $this->profileHash($profile);
+                    $contentMetadataUpdateStruct->remoteId = $this->getRemoteIdFromProfile($profile);
 
                     // we use a transaction since there are multiple db operations
                     try {
@@ -139,7 +164,7 @@ abstract class RemoteUserHandler
 
     protected function getRemoteIdFromProfile($profile)
     {
-
+        return $this->remoteIdPrefix . $this->profileHash($profile);
     }
 
     /**
@@ -167,7 +192,7 @@ abstract class RemoteUserHandler
      */
     protected function localUserNeedsUpdating(RemoteUser $remoteUser, $eZUser)
     {
-        return $this->profileHash($remoteUser->getProfile()) !== str_replace($this->remoteIdPrefix, '', $eZUser->contentInfo->remoteId);
+        return $this->getRemoteIdFromProfile($remoteUser->getProfile()) !== $eZUser->contentInfo->remoteId;
     }
 
     /**

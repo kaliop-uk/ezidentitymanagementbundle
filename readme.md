@@ -161,7 +161,7 @@ Contributions are welcome :-)
 
 4. put the service id in a *remoteuser_login* in the firewall section of security.yml
 
-5. create a handler class, which converts the RemoteUser into eZ users
+5. create a handler class, which converts the RemoteUser into eZ users, implementing RemoteUserHandlerInterface
     (probably subclassing Kaliop\IdentityManagementBundle\Security\User\RemoteUserHandler is a good idea)
 
 6. declare it as a service
