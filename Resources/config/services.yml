@@ -58,7 +58,7 @@ services:
 
     # The service used to load remote users and convert them to eZ users (done via the handlers map below)
     kaliop_identity.security.remoteuser_provider:
-        class: "%kaliop_identity.security.remoteuser_provider%"
+        class: "%kaliop_identity.security.remoteuser_provider.class%"
         arguments:
             # the eZ service which loads eZ repo users
             - "@ezpublish.security.user_provider"
