@@ -131,7 +131,7 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
                 throw new BadCredentialsException('The presented password cannot be empty.');
             }
 
-            // communication errors and handle config errors should be logged/handles by the client
+            // communication errors and config errors should be logged/handled by the client
             try {
 
                 $user = $this->client->AuthenticateUser($presentedUsername, $presentedPassword);

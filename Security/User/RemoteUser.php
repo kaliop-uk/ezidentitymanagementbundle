@@ -9,7 +9,11 @@ abstract class RemoteUser implements UserInterface
     protected $username;
     protected $password;
     /**
-     * Most likely to be set at creation time, holds the data coming from the remote system
+     * Most likely to be set at creation time, holds the data coming from the remote system.
+     *
+     * NB: the whole profile gets serialized in the session, as part of the Sf auth token. You should probably make sure
+     * that it does not include a huge amount of useless data, by implementing the Serializable interface...
+     *
      * @var mixed
      */
     protected $profile;

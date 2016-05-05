@@ -167,3 +167,9 @@ Contributions are welcome :-)
 6. declare it as a service
 
 7. add it the the handler map in the parameter `kaliop_identity.remoteuser_service_map`
+
+The logical flow is the following:
+- when a site visitor tries to log in, the client will query the remote system, and, if login is ok, build and return a
+  remoteUser object from the data it gets
+- immediately afterwards, the handler takes care of matching the remoteUser with an eZuser account, updating/creating it
+  if needed

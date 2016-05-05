@@ -100,6 +100,13 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
             } else {
                 $userHandler->updateRepoUser($remoteUser, $repoUser);
             }
+
+            // In case any post-processing is needed, give the user-handler a chance to execute it without the need to
+            // register further listeners
+            if (is_callable(array($userHandler, 'onRemoteUserLogin'))) {
+                $userHandler->onRemoteUserLogin($remoteUser, $repoUser);
+            }
+
         } catch (\Exception $e) {
             if ($this->logger) $this->logger->error("Unexpected error while finding/creating/updating repo user from data gotten from remote service");
             throw $e;

@@ -23,4 +23,12 @@ interface RemoteUserHandlerInterface
      * @return \eZ\Publish\API\Repository\Values\User\User|false
      */
     public function loadAPIUserByRemoteUser(RemoteUser $remoteUser);
+
+    /**
+     * Optional method: it will be called, if implemented, just after the remote user has logged in and the local user has
+     * been created/updated
+     *
+     * @return null
+     * public function onRemoteUserLogin(RemoteUser $user, $eZUser);
+     */
 }
