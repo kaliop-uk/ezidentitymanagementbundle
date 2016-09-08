@@ -10,6 +10,7 @@ use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Kaliop\IdentityManagementBundle\Adapter\ClientInterface;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Security\Core\Role\SwitchUserRole;
 
 /**
  * @todo:

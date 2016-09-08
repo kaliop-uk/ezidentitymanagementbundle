@@ -54,7 +54,7 @@ class Client implements ClientInterface
             $this->ldap->bind($this->settings['search_dn'], $this->settings['search_password']);
             $username = $this->ldap->escape($username, '', LDAP_ESCAPE_FILTER);
             $query = str_replace('{username}', $username, $this->settings['filter']);
-            if (isset($this->settings['attributes']) and count($this->settings['attributes'])) {
+            if (isset($this->settings['attributes']) && count($this->settings['attributes'])) {
                 $search = $this->ldap->find($this->settings['base_dn'], $query, $this->settings['attributes']);
             } else {
                 $search = $this->ldap->find($this->settings['base_dn'], $query);
