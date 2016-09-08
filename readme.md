@@ -173,3 +173,10 @@ The logical flow is the following:
   remoteUser object from the data it gets
 - immediately afterwards, the handler takes care of matching the remoteUser with an eZuser account, updating/creating it
   if needed
+
+
+[![License](https://poser.pugx.org/kaliop/identitymanagementbundle/license)](https://packagist.org/packages/kaliop/identitymanagementbundle)
+[![Latest Stable Version](https://poser.pugx.org/kaliop/identitymanagementbundle/v/stable)](https://packagist.org/packages/kaliop/identitymanagementbundle)
+[![Total Downloads](https://poser.pugx.org/kaliop/identitymanagementbundle/downloads)](https://packagist.org/packages/kaliop/identitymanagementbundle) 
+
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/deb0788e-d3f5-47f2-a86f-21a99011f803/mini.png)](https://insight.sensiolabs.com/projects/deb0788e-d3f5-47f2-a86f-21a99011f803)
