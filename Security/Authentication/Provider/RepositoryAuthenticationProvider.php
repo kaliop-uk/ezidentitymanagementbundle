@@ -2,7 +2,7 @@
 
 namespace Kaliop\IdentityManagementBundle\Security\Authentication\Provider;
 
-use eZ\Publish\API\Repository\Exceptions\NotFoundException;
+use eZ\Publish\Core\Base\Exceptions\NotFoundException;
 use eZ\Publish\API\Repository\Repository;
 use eZ\Publish\Core\MVC\Symfony\Security\User as EzUser;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
