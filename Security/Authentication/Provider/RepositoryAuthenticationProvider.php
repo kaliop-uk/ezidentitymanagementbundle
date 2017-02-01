@@ -60,7 +60,7 @@ class RepositoryAuthenticationProvider extends DaoAuthenticationProvider
                 try {
                     $users = $this->repository->getUserService()->loadUsersByEmail($token->getUsername());
                     if (!count($users)) {
-                        throw new NotFoundException();
+                        throw new NotFoundException('User', $token->getUsername());
                     }
                     /// @todo log a warning if many users do match the email
                     $userLogin = $users[0]->login;
