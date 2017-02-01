@@ -12,8 +12,8 @@ The base idea is that it should be easy to swap/add remote user services without
 the Symfony auth component (firewall/authenticator/userprovider/factory).
 
 As such, the logic of the 'ldap login handler' from eZP4 is replicated:
-1. when the user tries to log in the 1st time, retrieve his profile on the remote system, and create a corresponding eZ user on the fly
-2. when the user tries to log in after the 1st time, retrieve his profile on the remote system, and update the corresponding eZ user if needed
+1. when the user tries to log in the 1st time, retrieve his/her profile on the remote system, and create a corresponding eZ user on the fly
+2. when the user tries to log in after the 1st time, retrieve his/her profile on the remote system, and update the corresponding eZ user if needed
 
 Some nice bits are still missing, but the bundle should be sufficient to get started with simple LDAP integrations.
 
@@ -35,9 +35,8 @@ Contributions are welcome :-)
 
 ## Allow Log In By IP
 
-- This is implemented via a custom firewall
-    named *ip_login* in the *firewalls* section of security.yml
-    the firewall depends on a separate service for the mapping IP => user account name
+- This is implemented via a custom firewall named *ip_login* in the *firewalls* section of security.yml.
+    The firewall depends on a separate service for the mapping IP => user account name
 
 - To activate it: ...
 
@@ -48,8 +47,7 @@ Contributions are welcome :-)
 
 - For other custom external services you wll need to write more php code
 
-- This is implemented via a custom firewall
-    named *remoteuser_login* in the *firewalls* section of security.yml
+- This is implemented via a custom firewall named *remoteuser_login* in the *firewalls* section of security.yml
 
 - The firewall depends on two additional services for:
     * communicating to the remote webservice
@@ -138,7 +136,6 @@ Contributions are welcome :-)
             form_login:
                 require_previous_session: false
             logout: ~
-
 
 ### Allowing remote-service login to the Legacy Admin interface
 
