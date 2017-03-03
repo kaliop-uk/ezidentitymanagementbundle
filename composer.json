@@ -1,6 +1,7 @@
 {
   "name": "kaliop/identitymanagementbundle",
   "description": "Kaliop Identity Management Bundle",
+  "type": "ezplatform-bundle",
   "license": "GPL-2.0",
   "authors": [
     {
