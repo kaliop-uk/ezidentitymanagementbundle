@@ -93,7 +93,7 @@ class Client implements ClientInterface
         try {
             $this->validateLdapResults($search[0]);
         } catch (\Exception $e) {
-            if ($this->logger) $this->logger->warning('Invalid user profile for user: \'$username\': '.$e->getMessage());
+            if ($this->logger) $this->logger->warning("Invalid user profile for user: '$username': ".$e->getMessage());
 
             throw new AuthenticationServiceException('Invalid user profile: '.$e->getMessage());
         }
