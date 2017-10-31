@@ -74,6 +74,7 @@ Contributions are welcome :-)
         my.ldap_auth.client:
             class: Kaliop\IdentityManagementBundle\Adapter\LDAP\Client
             arguments:
+                # NB: here you can pass in either one ldap client, or an array of clients, to achieve high-availability
                 - "@my.ldap"
                 -
                     # the credentials used to serach the ldap
