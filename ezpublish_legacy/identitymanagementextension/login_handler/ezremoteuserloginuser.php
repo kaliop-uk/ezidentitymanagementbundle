@@ -61,6 +61,8 @@ class eZRemoteUserLoginUser extends eZUser
             return self::fetch($user->id);
 
         } catch(\Exception $e) {
+            eZDebug::writeError($e->getMessage(), __METHOD__ );
+
             return false;
         }
 

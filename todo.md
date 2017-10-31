@@ -17,6 +17,8 @@ Kaliop Identity Management Bundle
 
 - add a few more 'example' handlers for common services (twitter/fb/google ? do they all use oauth?)
 
+- to do: allow to use 2 fields to retrieve the user email if the 1st one is empty or invalid
+
 - to do: test: does ez native auth mechanism kick in before the remote one? If so ...
 - to do: make sure remote users can not log in into eZ with the hardcoded password (see RemoteUserHandler)
 - to do: store the password encrypted in the RemoteUser instead of plaintext
