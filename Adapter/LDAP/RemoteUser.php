@@ -41,11 +41,13 @@ class RemoteUser extends BaseRemoteUser
     }
 
     /**
-     * @todo throw if unset ?
      * @return string
      */
     public function getEmail()
     {
+        if (!isset($this->profile[$this->emailField])) {
+            throw new \RuntimeException("User account misses or has empty email (from ldap profile field '{$this->emailField}')");
+        }
         return $this->profile[$this->emailField];
     }
 

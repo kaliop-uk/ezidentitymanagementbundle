@@ -108,7 +108,7 @@ class RemoteUser implements UserProviderInterface, RemoteUserProviderInterface
             }
 
         } catch (\Exception $e) {
-            if ($this->logger) $this->logger->error("Unexpected error while finding/creating/updating repo user from data gotten from remote service");
+            if ($this->logger) $this->logger->error("Unexpected error while finding/creating/updating repo user from data gotten from remote service: " . $e->getMessage());
             throw $e;
         }
 
