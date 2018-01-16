@@ -27,7 +27,7 @@ Kaliop Identity Management Bundle
 - to do: check if it is a good idea to remove the 'remoteuser' provider in app/security.yml. Remoteusers after all are
          not meant to be used as actual logged in users anyway
 - to do: add support for forgotpassword
-- to do: add more comprehensive logging support
+- to do: add more comprehensive logging
 - to do: add an interface for RemoteUserHandler classes
 
 out of scope (but could be done):

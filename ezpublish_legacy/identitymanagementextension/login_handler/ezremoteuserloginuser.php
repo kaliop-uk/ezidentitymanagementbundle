@@ -61,12 +61,12 @@ class eZRemoteUserLoginUser extends eZUser
             return self::fetch($user->id);
 
         } catch(\Exception $e) {
+            /// @todo make it easier to tell apart system error from user errors such as bad password...
+
             eZDebug::writeError($e->getMessage(), __METHOD__ );
 
             return false;
         }
-
-        $checker = $container->get('security.authorization_checker');
     }
 
 }

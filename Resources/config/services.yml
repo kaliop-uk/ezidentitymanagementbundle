@@ -1,5 +1,4 @@
 parameters:
-    #kaliop_identity.interactive_event_listener.class: Kaliop\IdentityManagementBundle\EventListener\InteractiveLoginListener
     kaliop_identity.security.ip_to_user_mapper.class: Kaliop\IdentityManagementBundle\Security\Helper\IpToUserMapper
     kaliop_identity.security.authentication.provider.ip: Kaliop\IdentityManagementBundle\Security\Authentication\Provider\IPAuthenticationProvider
     kaliop_identity.security.authentication.listener.ip.class: Kaliop\IdentityManagementBundle\Security\Firewall\IPListener
@@ -14,6 +13,9 @@ parameters:
     # Kaliop\IdentityManagementBundle\Adapter\AMS\RemoteUser: kaliop_identity.security.remoteuser_handler.ams
     kaliop_identity.remoteuser_service_map: {}
 
+    # When set to true, authentication errors of type UsernameNotFoundException, BadCredentialsException and unknown
+    # exceptions will be masked with a standard error message
+    kaliop_identity.mask_user_exceptions: true
 
 services:
 
@@ -49,7 +51,7 @@ services:
             - "" # A client service. Will be injected from the config of the firewall
             - "" # A user provider service. Will be injected from the config of the firewall
             - "" # Firewall id. Will be injected from the config of the firewall
-            - true
+            - %kaliop_identity.mask_user_exceptions%
         abstract: true
     # the security listener is just a plain form-based one
     kaliop_identity.security.authentication.listener.remoteuser:

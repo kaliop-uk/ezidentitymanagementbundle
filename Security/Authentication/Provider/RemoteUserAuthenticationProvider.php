@@ -7,6 +7,9 @@ use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\Authentication\Token\UsernamePasswordToken;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\Security\Core\Exception\AuthenticationServiceException;
+use Symfony\Component\Security\Core\Exception\UsernameNotFoundException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Kaliop\IdentityManagementBundle\Adapter\ClientInterface;
 use Psr\Log\LoggerInterface;
@@ -19,11 +22,18 @@ use Symfony\Component\Security\Core\Role\SwitchUserRole;
  */
 class RemoteUserAuthenticationProvider implements AuthenticationProviderInterface
 {
+    /**
+     * @var bool $hideUserNotFoundExceptions when true, auth exceptions of type UsernameNotFoundException,
+     * BadCredentialsException and unkown (non-AuthenticationException) will be masked with a standard error message
+     */
     protected $hideUserNotFoundExceptions;
     //protected $userChecker;
     protected $providerKey;
+    /** @var ClientInterface $client */
     protected $client;
+    /** @var UserProviderInterface $userProvider */
     protected $userProvider;
+    /** @var LoggerInterface|null $logger */
     protected $logger;
 
     public function __construct(ClientInterface $client, UserProviderInterface $userProvider, $providerKey, $hideUserNotFoundExceptions = true)
@@ -52,10 +62,8 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
      * fetch 1st, then check pwd, we do fetch-while-checking-pwd
      *
      * @param TokenInterface $token
-     * @return UsernamePasswordToken|void
-     * @throws AuthenticationServiceException
-     * @throws UsernameNotFoundException
-     * @throws \Exception
+     * @return UsernamePasswordToken
+     * @throws AuthenticationException
      *
      * @see DaoAuthenticationProvider
      */
@@ -65,14 +73,14 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
             return;
         }
 
+        /* we can not fetch the user 1st based on his login
         /// @todo throw a BadCredentialsException instead ?
         $username = $token->getUsername();
         if ('' === $username || null === $username) {
             $username = 'NONE_PROVIDED';
         }
 
-        // we can not fetch the user 1st based on his login
-        /* try {
+        try {
             $user = $this->retrieveUser($username, $token);
         } catch (UsernameNotFoundException $e) {
             if ($this->hideUserNotFoundExceptions) {
@@ -92,6 +100,12 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
             $user = $this->retrieveUserAndCheckAuthentication($token);
             /// @todo !important reintroduce this check?
             //$this->userChecker->checkPostAuth($user);
+        } catch (UsernameNotFoundException $e) {
+            if ($this->hideUserNotFoundExceptions) {
+                throw new BadCredentialsException('Bad credentials.', 0, $e);
+            }
+
+            throw $e;
         } catch (BadCredentialsException $e) {
             if ($this->hideUserNotFoundExceptions) {
                 throw new BadCredentialsException('Bad credentials.', 0, $e);
@@ -109,6 +123,7 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
     /**
      * @param UsernamePasswordToken $token
      * @return mixed|UserInterface
+     * @throws BadCredentialsException|AuthenticationException
      */
     protected function retrieveUserAndCheckAuthentication(UsernamePasswordToken $token)
     {
@@ -119,6 +134,7 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
             if ($currentUser->getPassword() !== $token->getCredentials()) {
                 throw new BadCredentialsException('The credentials were changed from another session.');
             }
+
             return $currentUser;
 
         } else {
@@ -140,8 +156,14 @@ class RemoteUserAuthenticationProvider implements AuthenticationProviderInterfac
                 //$user = $this->userProvider->loadUserByUsername($username);
                 return $user;
 
+            } catch(AuthenticationException $e) {
+                // let through any exception of the expected authentication type
+                throw $e;
             } catch(\Exception $e) {
-                throw new BadCredentialsException('The presented username or password is invalid.');
+                // we mask any internal, unexpected error from the Client
+                /// @todo we should log a message here: the Client used an unexpected exception type...
+                /// @tood we should really be using an AuthenticationServiceException here
+                throw new BadCredentialsException('The presented username or password is invalid.', 0, $e);
             }
 
             // no need to check the password after loading the user: the remote ws does that
