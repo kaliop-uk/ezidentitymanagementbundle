@@ -177,4 +177,5 @@ The logical flow is the following:
 [![Latest Stable Version](https://poser.pugx.org/kaliop/identitymanagementbundle/v/stable)](https://packagist.org/packages/kaliop/identitymanagementbundle)
 [![Total Downloads](https://poser.pugx.org/kaliop/identitymanagementbundle/downloads)](https://packagist.org/packages/kaliop/identitymanagementbundle) 
 
+[![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/kaliop-uk/ezidentitymanagementbundle/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/kaliop-uk/ezidentitymanagementbundle/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/deb0788e-d3f5-47f2-a86f-21a99011f803/mini.png)](https://insight.sensiolabs.com/projects/deb0788e-d3f5-47f2-a86f-21a99011f803)
