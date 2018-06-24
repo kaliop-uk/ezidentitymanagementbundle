@@ -11,7 +11,7 @@
   "require": {
     "php": ">=5.3.3",
     "ezsystems/ezpublish-kernel": "*",
-    "paragonie/random_compat": "^1.1"
+    "paragonie/random_compat": "^1.1 || ^2.0"
   },
   "autoload": {
     "psr-4": {"Kaliop\\IdentityManagementBundle\\": ""}
