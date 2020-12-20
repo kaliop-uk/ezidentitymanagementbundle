@@ -15,5 +15,11 @@
   },
   "autoload": {
     "psr-4": {"Kaliop\\IdentityManagementBundle\\": ""}
-  }
+  },
+    "funding": [
+        {
+            "type": "github",
+            "url": "https://github.com/sponsors/tanoconsulting"
+        }
+    ]
 }
