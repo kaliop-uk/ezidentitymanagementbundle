@@ -45,7 +45,7 @@ class eZRemoteUserLoginUser extends eZUser
             // get the authorized token, which contains the remoteUser
             $authToken = $remoteUserAuthProvider->authenticate($token);
             // convert the remoteUser into an eZP user (this creates the user in the db if needed)
-            $request = $container->get('request');
+            $request = $container->get('request_stack')->getCurrentRequest();
             $event = new InteractiveLoginEvent($request, $authToken);
             $container->get("event_dispatcher")->dispatch("security.interactive_login", $event);
 
